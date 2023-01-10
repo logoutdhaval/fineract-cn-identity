@@ -18,13 +18,14 @@
  */
 package org.apache.fineract.cn.identity.rest;
 
-import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
-import org.apache.fineract.cn.identity.api.v1.domain.PermittableGroup;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.command.gateway.CommandGateway;
+import org.apache.fineract.cn.identity.api.v1.PermittableGroupIds;
+import org.apache.fineract.cn.identity.api.v1.domain.PermittableGroup;
 import org.apache.fineract.cn.identity.internal.command.CreatePermittableGroupCommand;
 import org.apache.fineract.cn.identity.internal.service.PermittableGroupService;
+import org.apache.fineract.cn.identity.internal.service.PermittableGroupServiceForSQL;
 import org.apache.fineract.cn.lang.ServiceException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -41,13 +42,13 @@ import java.util.List;
 @SuppressWarnings("unused")
 @RestController
 @RequestMapping("/permittablegroups")
-@Profile("cassandra")
-public class PermittableGroupRestController {
-  private final PermittableGroupService service;
+@Profile("postgres")
+public class PermittableGroupRestControllerForSQL {
+  private final PermittableGroupServiceForSQL service;
   private final CommandGateway commandGateway;
 
-  public PermittableGroupRestController(final PermittableGroupService service,
-                                        final CommandGateway commandGateway) {
+  public PermittableGroupRestControllerForSQL(final PermittableGroupServiceForSQL service,
+                                              final CommandGateway commandGateway) {
     this.service = service;
     this.commandGateway = commandGateway;
   }

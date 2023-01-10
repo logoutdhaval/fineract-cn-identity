@@ -28,6 +28,7 @@ import org.apache.fineract.cn.crypto.config.EnableCrypto;
 import org.apache.fineract.cn.identity.internal.util.IdentityConstants;
 import org.apache.fineract.cn.lang.config.EnableServiceException;
 import org.apache.fineract.cn.lang.config.EnableTenantContext;
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -60,6 +61,10 @@ public class IdentityServiceConfig extends WebMvcConfigurerAdapter {
 
   public IdentityServiceConfig() {}
 
+  @Bean
+  public Flyway flyway(){
+    return new Flyway();
+  }
 
   @Bean(name = IdentityConstants.JSON_SERIALIZER_NAME)
   public Gson gson() {

@@ -26,6 +26,7 @@ ext.versions = [
         frameworklang      : '0.1.0-BUILD-SNAPSHOT',
         frameworkasync     : '0.1.0-BUILD-SNAPSHOT',
         frameworkcassandra : '0.1.0-BUILD-SNAPSHOT',
+        frameworkpostgresql: '0.1.0-BUILD-SNAPSHOT',
         frameworkcommand   : '0.1.0-BUILD-SNAPSHOT',
         jjwt               : '0.6.0',
         hibernatevalidator : '5.3.0.Final'

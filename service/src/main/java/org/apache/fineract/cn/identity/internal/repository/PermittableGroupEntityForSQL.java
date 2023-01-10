@@ -31,10 +31,9 @@ import java.util.Objects;
  * @author Myrle Krantz
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-@Profile("cassandra")
+@Profile("postgres")
 @Table(name = PermittableGroups.TABLE_NAME)
-public class PermittableGroupEntity {
-  @PartitionKey
+public class PermittableGroupEntityForSQL {
   @Column(name = PermittableGroups.IDENTIFIER_COLUMN)
   private String identifier;
 
@@ -42,7 +41,7 @@ public class PermittableGroupEntity {
   @Column(name = PermittableGroups.PERMITTABLES_COLUMN)
   private List<PermittableType> permittables;
 
-  public PermittableGroupEntity() {
+  public PermittableGroupEntityForSQL() {
   }
 
   public String getIdentifier() {
@@ -65,7 +64,7 @@ public class PermittableGroupEntity {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    PermittableGroupEntity that = (PermittableGroupEntity) o;
+    PermittableGroupEntityForSQL that = (PermittableGroupEntityForSQL) o;
     return Objects.equals(identifier, that.identifier) &&
             Objects.equals(permittables, that.permittables);
   }

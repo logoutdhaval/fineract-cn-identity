@@ -18,31 +18,34 @@
  */
 package org.apache.fineract.cn.identity.internal.repository;
 
-import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.schemabuilder.Create;
-import com.datastax.driver.core.schemabuilder.CreateType;
-import com.datastax.driver.core.schemabuilder.SchemaBuilder;
 import com.datastax.driver.mapping.Mapper;
+import org.apache.fineract.cn.cassandra.core.CassandraSessionProvider;
+import org.apache.fineract.cn.cassandra.core.TenantAwareCassandraMapperProvider;
+//import org.apache.fineract.cn.cassandra.core.TenantAwarePostgresMapperProvider;
+import org.apache.fineract.cn.cassandra.core.TenantAwareEntityTemplate;
+import org.apache.fineract.cn.identity.internal.util.DataSourceUtils;
+import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.apache.fineract.cn.cassandra.core.CassandraSessionProvider;
-import org.apache.fineract.cn.cassandra.core.TenantAwareCassandraMapperProvider;
-import org.apache.fineract.cn.cassandra.core.TenantAwareEntityTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 /**
  * @author Myrle Krantz
  */
 @Component
-//@Profile("cassandra")
-public class PermittableGroups {
+@Profile("postgres")
+public class PermittableGroupsForSQL {
   static final String TABLE_NAME = "isis_permittable_groups";
   static final String IDENTIFIER_COLUMN = "identifier";
   static final String PERMITTABLES_COLUMN = "permittables";
@@ -54,44 +57,44 @@ public class PermittableGroups {
 
   private final CassandraSessionProvider cassandraSessionProvider;
   private final TenantAwareEntityTemplate tenantAwareEntityTemplate;
+//  private final IsisPermittableDAO isisPermittableDAO;
   private final TenantAwareCassandraMapperProvider tenantAwareCassandraMapperProvider;
+  @Autowired
+  private Flyway flyway;
 
   @Autowired
-  PermittableGroups(
+  private final Environment environment;
+
+//  private final DataSource dataSource;
+//  private final FlywayFactoryBean flywayFactoryBean;
+
+  @Autowired
+  PermittableGroupsForSQL(
           final CassandraSessionProvider cassandraSessionProvider,
           final TenantAwareEntityTemplate tenantAwareEntityTemplate,
-          final TenantAwareCassandraMapperProvider tenantAwareCassandraMapperProvider) {
+          final TenantAwareCassandraMapperProvider tenantAwareCassandraMapperProvider, Environment environment) {
     this.cassandraSessionProvider = cassandraSessionProvider;
     this.tenantAwareEntityTemplate = tenantAwareEntityTemplate;
     this.tenantAwareCassandraMapperProvider = tenantAwareCassandraMapperProvider;
+    this.environment = environment;
   }
 
   public void buildTable() {
-    final CreateType createType = SchemaBuilder.createType(TYPE_NAME)
-        .ifNotExists()
-        .addColumn(PATH_FIELD, DataType.text())
-        .addColumn(METHOD_FIELD, DataType.text())
-        .addColumn(SOURCE_GROUP_ID_FIELD, DataType.text());
-
-    cassandraSessionProvider.getTenantSession().execute(createType);
-
-    final Create create = SchemaBuilder.createTable(TABLE_NAME)
-        .ifNotExists()
-        .addPartitionKey(IDENTIFIER_COLUMN, DataType.text())
-        .addUDTListColumn(PERMITTABLES_COLUMN, SchemaBuilder.frozen(TYPE_NAME));
-
-    cassandraSessionProvider.getTenantSession().execute(create);
-
+    flyway.setLocations("db/migrations/postgresql");
+    flyway.setDataSource("jdbc:postgresql://localhost:5432/seshat","postgres","postgres");
+    flyway.setBaselineOnMigrate(true);
+//    flyway.setSchemas("seshat");
+    flyway.migrate();
   }
 
-  public void add(final PermittableGroupEntity instance) {
+  public void add(final PermittableGroupEntityForSQL instance) {
     tenantAwareEntityTemplate.save(instance);
   }
 
-  public Optional<PermittableGroupEntity> get(final String identifier)
+  public Optional<PermittableGroupEntityForSQL> get(final String identifier)
   {
-    final PermittableGroupEntity instance =
-            tenantAwareCassandraMapperProvider.getMapper(PermittableGroupEntity.class).get(identifier);
+    final PermittableGroupEntityForSQL instance =
+            tenantAwareCassandraMapperProvider.getMapper(PermittableGroupEntityForSQL.class).get(identifier);
 
     if (instance != null) {
       Assert.notNull(instance.getIdentifier());
@@ -100,9 +103,9 @@ public class PermittableGroups {
     return Optional.ofNullable(instance);
   }
 
-  public List<PermittableGroupEntity> getAll() {
+  public List<PermittableGroupEntityForSQL> getAll() {
     final Session tenantSession = cassandraSessionProvider.getTenantSession();
-    final Mapper<PermittableGroupEntity> entityMapper = tenantAwareCassandraMapperProvider.getMapper(PermittableGroupEntity.class);
+    final Mapper<PermittableGroupEntityForSQL> entityMapper = tenantAwareCassandraMapperProvider.getMapper(PermittableGroupEntityForSQL.class);
 
     final Statement statement = QueryBuilder.select().all().from(TABLE_NAME);
 

@@ -18,11 +18,30 @@
 #
 
 spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/seshat
+    username: postgres
+    password: postgres
+    platform: postgres
+    dbcp2:
+      validation-query: SELECT 1
+    jpa:
+      show-sql: true
   cloud:
     discovery:
       enabled: false
     config:
       enabled: false
+
+spring.flyway:
+  enabled: true
+  validate-on-migrate: true
+  user: postgres
+  password: postgres
+  schemas: seshat
+  url: jdbc:postgresql://localhost:5432/seshat
+  locations: filesystem:db/migration/postgresql
 
 server:
   port: 2021
@@ -75,3 +94,17 @@ kubernetes:
 ribbon:
   eureka:
     enabled: false
+flyway:
+  user: postgres
+  password: postgres
+  schemas: seshat
+  url: jdbc:postgresql://localhost:5432/seshat
+  locations: filesystem:db/migration/postgresql
+
+postgresql:
+  driverClass: org.postgresql.Driver
+  database: seshat
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres

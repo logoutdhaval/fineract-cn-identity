@@ -21,18 +21,14 @@ package org.apache.fineract.cn.identity.rest;
 import org.apache.fineract.cn.anubis.annotation.AcceptedTokenType;
 import org.apache.fineract.cn.anubis.annotation.Permittable;
 import org.apache.fineract.cn.anubis.api.v1.domain.ApplicationSignatureSet;
-import org.apache.fineract.cn.identity.internal.command.handler.Provisioner;
+import org.apache.fineract.cn.identity.internal.command.handler.ProvisionerForSQL;
 import org.apache.fineract.cn.identity.internal.service.TenantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Myrle Krantz
@@ -40,15 +36,15 @@ import org.springframework.web.bind.annotation.RestController;
 @SuppressWarnings("unused")
 @RestController
 @RequestMapping()
-@Profile("cassandra")
-public class InitializeRestController {
+@Profile("postgres")
+public class InitializeRestControllerForSQL {
   private final TenantService tenantService;
-  private final Provisioner provisioner;
+  private final ProvisionerForSQL provisioner;
 
   @Autowired
-  InitializeRestController(
+  InitializeRestControllerForSQL(
       final TenantService tenantService,
-      final Provisioner provisioner)
+      final ProvisionerForSQL provisioner)
   {
     this.tenantService = tenantService;
     this.provisioner = provisioner;
